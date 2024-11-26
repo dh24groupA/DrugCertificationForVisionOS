@@ -1,0 +1,32 @@
+[
+  {
+    "id": "asdfg",
+    "name": "シスプラチン",
+    "purpose": "→症状の緩和",
+  },
+  {
+    "id": "qwert",
+    "name": "カルボプラチン",
+    "purpose": "→症状の緩和"
+  },
+  {
+    "id": "zxcvb",
+    "name": "ネダプラチン",
+    "purpose": "→症状の緩和"
+  },
+  {
+    "id": "poiuy",
+    "name": "ゲムシタビン",
+    "purpose": "→症状の緩和"
+  },
+  {
+    "id": "lkjhg",
+    "name": "塩酸イリノテカン",
+    "purpose": "→症状の緩和"
+  },
+  {
+    "id": "mnbvc",
+    "name": "エルロチニブ",
+    "purpose": "→症状の緩和"
+  }
+]
