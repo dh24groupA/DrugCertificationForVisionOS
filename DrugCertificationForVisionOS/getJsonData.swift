@@ -7,19 +7,33 @@
 import SwiftUI
 
 
-func getMedicineData(key: String, value: String, fileName: String = "medicine") -> String {
-    let medicines = loadJson(fileName: fileName)
-    if let matchingMedicine = medicines.first(where: { medicine in
-        let mirror = Mirror(reflecting: medicine)
+func getJsonData<T: Codable>(
+    searchKey: String,
+    searchValue: String,
+    returnKey: String,
+    fileName: String = "medicine",
+    type: T.Type
+) -> String {
+    // 修正した loadJson を使用
+    let items = loadJson(fileName: fileName, type: type)
+    
+    // 検索対象のデータを見つける
+    if let matchingItem = items.first(where: { item in
+        let mirror = Mirror(reflecting: item)
         for child in mirror.children {
-            if child.label == key, let childValue = child.value as? String, childValue == value {
+            if child.label == searchKey, let childValue = child.value as? String, childValue == searchValue {
                 return true
             }
         }
         return false
     }) {
-        return matchingMedicine.name
-    } else {
-        return "一致するデータが見つかりません"
+        // 指定したキーの値を返す
+        let mirror = Mirror(reflecting: matchingItem)
+        for child in mirror.children {
+            if child.label == returnKey, let returnValue = child.value as? String {
+                return returnValue
+            }
+        }
     }
+    return "一致するデータが見つかりません"
 }
