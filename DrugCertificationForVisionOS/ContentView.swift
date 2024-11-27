@@ -14,6 +14,8 @@ struct ContentView: View {
     @State private var showDatePicker = false
     @State private var recordDate = Calendar.current.date(byAdding: .day, value: -1, to: Date()) ?? Date()
     @State var isShowAlert = false
+    @State private var showFirstAlert = false
+    @State private var showSecondAlert = false
     @State var pqrData = ""
     @State var mqrData = ""
     
@@ -47,10 +49,11 @@ struct ContentView: View {
         case medAuth
         case patientAuth
         case scanned
+        case scannedExact
         case finished
     }
     
-    @State private var setting = Setting.scanned
+    @State private var setting = Setting.title
     
     var body: some View {
         ZStack {
@@ -184,8 +187,15 @@ struct ContentView: View {
                     }
                 }
                 .onAppear {
-                    medName = "お薬飲めたね"
-                    medID = mqrData
+                    
+                    
+                }
+                .onDisappear{
+                    medName = getJsonData(searchKey: "id", searchValue: mqrData, returnKey: "name", fileName: "medicines", type: medicine.self)
+                    
+                    medPurpose = getJsonData(searchKey: "id", searchValue: mqrData, returnKey: "purpose", fileName: "medicines", type: medicine.self)
+                    
+                    medRoute = getJsonData(searchKey: "id", searchValue: mqrData, returnKey: "route", fileName: "medicines", type: medicine.self)
                     
                 }
                 
@@ -242,20 +252,117 @@ struct ContentView: View {
                         .padding(.bottom,200)
                     }
                 }
-                .onAppear {
-                    patientName = "山田 太郎"
-                    patientID = "3849872"
+                .onDisappear {
+                    
+                    patientName
+                    = getJsonData(searchKey: "id", searchValue: pqrData, returnKey: "name", fileName: "patients", type: patient.self)
+                    
+                    patientAge = getJsonData(searchKey: "id", searchValue: pqrData, returnKey: "age", fileName: "patients", type: patient.self)
+                    
+                    patientMed = getJsonData(searchKey: "id", searchValue: pqrData, returnKey: "medicine", fileName: "patients", type: patient.self)
+                    
+                    patientDose = getJsonData(searchKey: "id", searchValue: pqrData, returnKey: "dose", fileName: "patients", type: patient.self)
+                    
+                    patientTime = getJsonData(searchKey: "id", searchValue: pqrData, returnKey: "time", fileName: "patients", type: patient.self)
+                    
+                    patientNote = getJsonData(searchKey: "id", searchValue: pqrData, returnKey: "note", fileName: "patients", type: patient.self)
+                    
+    
                 }
                 
                 
-            case .scanned:
+
+                // scanned状態でのアラート表示部分を以下のように修正
+
+                case .scanned:
+                    ZStack {
+                        VStack {
+                            HStack {
+                                Button(action: {
+                                    setting = .patientAuth
+                                }) {
+                                    Text("scanned")
+                                }
+                                .padding(.leading)
+                                Spacer()
+                                
+                                Text("薬剤投与前最終確認")
+                                    .font(.largeTitle)
+                                    .bold()
+                                    .padding(.bottom)
+                                    .padding(.horizontal)
+                                
+                                Spacer()
+                                
+                                Button(role: .destructive) {
+                                    showFirstAlert = true  // 最初のアラートを表示
+                                } label: {
+                                    Label("投与予定の薬剤と選択された薬剤が一致しません", systemImage: "pencil.and.outline")
+                                }
+                                .alert("投与予定の薬剤と選択された薬剤が一致しません", isPresented: $showFirstAlert) {
+                                    Button("No") {}
+                                    Button("Yes") {
+                                        // 最初のアラートが閉じられた後、次のアラートを表示
+                                        showSecondAlert = true
+                                    }
+                                } message: {
+                                    Text("それでも投与記録を残しますか？")
+                                }
+                            }
+                            .padding()
+                            Spacer()
+                            
+                            HStack {
+                                VStack(alignment: .leading, spacing: 10) {
+                                    HStack {
+                                        Text("記録日:")
+                                        Text("\(formattedDate(recordDate))")
+                                            .onTapGesture {
+                                                withAnimation {
+                                                    showDatePicker.toggle()
+                                                }
+                                            }
+                                    }
+                                    Text("患者名: \(patientName.isEmpty ? "未入力" : patientName)")
+                                    Text("年齢: \(patientAge.isEmpty ? "未入力" : patientAge)")
+                                }
+                                .padding()
+                                
+                                VStack(alignment: .leading, spacing: 10) {
+                                    Text("投与すべき薬剤: \(patientMed.isEmpty ? "未入力" : patientMed)")
+                                    Text("投与する薬剤: \(medName.isEmpty ? "未入力" : medName)")
+                                    Text("投与方法: \(medRoute.isEmpty ? "未入力" : medRoute)")
+                                    Text("注意事項: \(patientNote.isEmpty ? "未入力" : patientNote)")
+                                }
+                            }
+                            .padding(.bottom, 0)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity) // 親ビューを画面全体に
+                        }
+                        .alert("本当に記録しますか？", isPresented: $showSecondAlert) { // 2番目のアラート
+                            Button("No") {}
+                            Button("Yes", action: {
+                                setting = .finished
+                            })
+                        } message: {
+                            Text("投与記録を完了しました。")
+                        }
+                    }
+                    .onAppear{
+                        if cmpstr(str1: medName, str2: patientMed){
+                            setting = .scannedExact
+                        }else{
+                            setting = .scanned
+                        }
+                    }
+                
+            case .scannedExact:
                 ZStack{
                     VStack {
                         HStack {
                             Button(action: {
                                 setting = .patientAuth
                             }) {
-                                Text("戻る")
+                                Text("Exact")
                             }
                             .padding(.leading)
                             Spacer()
@@ -302,7 +409,7 @@ struct ContentView: View {
                             .padding()
                             
                             VStack(alignment: .leading, spacing: 10) {
-                                Text("投与薬剤: \(patientMed.isEmpty ? "未入力" : patientMed)")
+                                Text("投与する薬剤: \(patientMed.isEmpty ? "未入力" : patientMed)")
                                 Text("投与方法: \(medRoute.isEmpty ? "未入力" : medRoute)")
                                 Text("注意事項: \(patientNote.isEmpty ? "未入力" : patientNote)")
                             }
@@ -313,23 +420,11 @@ struct ContentView: View {
                     }
                 }
                 .onAppear {
-                    patientName = getJsonData(searchKey: "id", searchValue: pqrData, returnKey: "name", fileName: "patients", type: patient.self)
-                    
-                    patientAge = getJsonData(searchKey: "id", searchValue: pqrData, returnKey: "age", fileName: "patients", type: patient.self)
-                    
-                    patientMed = getJsonData(searchKey: "id", searchValue: pqrData, returnKey: "medicine", fileName: "patients", type: patient.self)
-                    
-                    patientDose = getJsonData(searchKey: "id", searchValue: pqrData, returnKey: "dose", fileName: "patients", type: patient.self)
-                    
-                    patientTime = getJsonData(searchKey: "id", searchValue: pqrData, returnKey: "time", fileName: "patients", type: patient.self)
-                    
-                    patientNote = getJsonData(searchKey: "id", searchValue: pqrData, returnKey: "note", fileName: "patients", type: patient.self)
-                    
-                    medName = getJsonData(searchKey: "id", searchValue: mqrData, returnKey: "name", fileName: "medicines", type: medicine.self)
-                    
-                    medPurpose = getJsonData(searchKey: "id", searchValue: mqrData, returnKey: "purpose", fileName: "medicines", type: medicine.self)
-                    
-                    medRoute = getJsonData(searchKey: "id", searchValue: mqrData, returnKey: "route", fileName: "medicines", type: medicine.self)
+                    if cmpstr(str1: medName, str2: patientMed){
+                        setting = .scannedExact
+                    }else{
+                        setting = .scanned
+                    }
                 }
                 
             case .finished:
@@ -348,6 +443,8 @@ struct ContentView: View {
         }
     }
 }
+
+
 
 func formattedDate(_ date: Date) -> String {
     let formatter = DateFormatter()
