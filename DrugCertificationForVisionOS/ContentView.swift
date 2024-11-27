@@ -27,20 +27,30 @@ struct ContentView: View {
     @State var mqr5Data = "qwert"
     @State var mqr6Data = "asdfg"
     
-    @State private var patientName = ""
+    
     @State private var patientID = ""
-    @State private var medicineName = ""
-    @State private var medicineID = ""
+    @State private var patientName = ""
+    @State private var patientAge = ""
+    @State private var patientMed = ""
+    @State private var patientDose = ""
+    @State private var patientTime = ""
+    @State private var patientNote = ""
+    
+    @State private var medID = ""
+    @State private var medName = ""
+    @State private var medPurpose = ""
+    @State private var medRoute = ""
+    
     
     enum Setting {
         case title
-        case drugAuth
+        case medAuth
         case patientAuth
         case scanned
         case finished
     }
     
-    @State private var setting = Setting.patientAuth
+    @State private var setting = Setting.scanned
     
     var body: some View {
         ZStack {
@@ -53,7 +63,7 @@ struct ContentView: View {
                     
                     
                     Button("認証開始") {
-                        setting = .drugAuth
+                        setting = .medAuth
                     }
                     .padding()
                     .background(Color.blue)
@@ -61,7 +71,7 @@ struct ContentView: View {
                     .cornerRadius(10)
                 }
                 
-            case .drugAuth:
+            case .medAuth:
                 ZStack{
                     VStack {
                         HStack {
@@ -174,8 +184,8 @@ struct ContentView: View {
                     }
                 }
                 .onAppear {
-                    medicineName = "お薬飲めたね"
-                    medicineID = mqrData
+                    medName = "お薬飲めたね"
+                    medID = mqrData
                     
                 }
                 
@@ -184,7 +194,7 @@ struct ContentView: View {
                     VStack {
                         HStack {
                             Button(action: {
-                                setting = .title
+                                setting = .medAuth
                             }) {
                                 Text("戻る")
                             }
@@ -222,7 +232,7 @@ struct ContentView: View {
                                     .padding(80)
                                 
                                 Button(action: {
-                                    pqrData = pqr1Data
+                                    pqrData = pqr2Data
                                     setting = .scanned
                                 }) {
                                     Text("このコードを選ぶ")
@@ -247,7 +257,7 @@ struct ContentView: View {
                             }) {
                                 Text("戻る")
                             }
-                            .padding()
+                            .padding(.leading)
                             Spacer()
                             
                             Text("薬剤投与前最終確認")
@@ -287,36 +297,40 @@ struct ContentView: View {
                                         }
                                 }
                                 Text("患者名: \(patientName.isEmpty ? "未入力" : patientName)")
-                                Text("患者ID: \(patientID.isEmpty ? "未入力" : patientID)")
+                                Text("年齢: \(patientAge.isEmpty ? "未入力" : patientAge)")
                             }
                             .padding()
                             
                             VStack(alignment: .leading, spacing: 10) {
-                                Text("薬品名: \(medicineName.isEmpty ? "未入力" : medicineName)")
-                                Text("投与方法: 点滴")
-                                Text("投与用量: 800ml")
+                                Text("投与薬剤: \(patientMed.isEmpty ? "未入力" : patientMed)")
+                                Text("投与方法: \(medRoute.isEmpty ? "未入力" : medRoute)")
+                                Text("注意事項: \(patientNote.isEmpty ? "未入力" : patientNote)")
                             }
                         }
-                        .padding()
+                        .padding(.bottom, 0)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity) // 親ビューを画面全体に
                         
-                        if showDatePicker {
-                            DatePicker("記録日", selection: $recordDate, in: Date() - 1...Date(), displayedComponents: .date)
-                                .datePickerStyle(WheelDatePickerStyle())
-                                .labelsHidden()
-                                .environment(\.locale, Locale(identifier: "ja_JP"))
-                                .frame(height: 150)
-                                .padding()
-                        }
                     }
                 }
                 .onAppear {
-                    medicineName = getJsonData(searchKey: "id", searchValue: mqrData, returnKey: "name", fileName: "medicines", type: medicine.self)
-                    
                     patientName = getJsonData(searchKey: "id", searchValue: pqrData, returnKey: "name", fileName: "patients", type: patient.self)
                     
+                    patientAge = getJsonData(searchKey: "id", searchValue: pqrData, returnKey: "age", fileName: "patients", type: patient.self)
                     
+                    patientMed = getJsonData(searchKey: "id", searchValue: pqrData, returnKey: "medicine", fileName: "patients", type: patient.self)
+                    
+                    patientDose = getJsonData(searchKey: "id", searchValue: pqrData, returnKey: "dose", fileName: "patients", type: patient.self)
+                    
+                    patientTime = getJsonData(searchKey: "id", searchValue: pqrData, returnKey: "time", fileName: "patients", type: patient.self)
+                    
+                    patientNote = getJsonData(searchKey: "id", searchValue: pqrData, returnKey: "note", fileName: "patients", type: patient.self)
+                    
+                    medName = getJsonData(searchKey: "id", searchValue: mqrData, returnKey: "name", fileName: "medicines", type: medicine.self)
+                    
+                    medPurpose = getJsonData(searchKey: "id", searchValue: mqrData, returnKey: "purpose", fileName: "medicines", type: medicine.self)
+                    
+                    medRoute = getJsonData(searchKey: "id", searchValue: mqrData, returnKey: "route", fileName: "medicines", type: medicine.self)
                 }
-                
                 
             case .finished:
                 VStack {
@@ -339,6 +353,14 @@ func formattedDate(_ date: Date) -> String {
     let formatter = DateFormatter()
     formatter.dateFormat = "yy/MM/dd"
     return formatter.string(from: date)
+}
+
+func cmpstr(str1: String,str2: String) -> Bool{
+    if(str1 == str2){
+        return true
+    }else{
+        return false
+    }
 }
 
 #Preview(windowStyle: .automatic) {

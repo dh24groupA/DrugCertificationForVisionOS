@@ -10,6 +10,7 @@ struct medicine: Codable {
     var id: String          //薬品id
     var name: String        //薬品名
     var purpose: String     //投与目的
+    var route: String       //投与方法
 }
 
 struct patient: Codable {
@@ -17,6 +18,9 @@ struct patient: Codable {
     var name: String        //患者氏名
     var age: String         //年齢
     var medicine: String    //投与薬剤名
+    var dose: String        //用量
+    var time: String        //投与時間
+    var note: String        //注意事項
 }
 
 func loadJson<T: Codable>(fileName: String, type: T.Type) -> [T] {

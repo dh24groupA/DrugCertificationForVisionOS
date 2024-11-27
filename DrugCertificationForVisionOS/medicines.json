@@ -2,31 +2,37 @@
   {
     "id": "asdfg",
     "name": "シスプラチン",
-    "purpose": "→症状の緩和",
+    "purpose": "固形腫瘍（肺がん、胃がん、泌尿生殖器がんなど）",
+    "route": "点滴静注"
   },
   {
     "id": "qwert",
     "name": "カルボプラチン",
-    "purpose": "→症状の緩和"
+    "purpose": "肺がん、卵巣がん、頭頸部がん",
+    "route": "点滴静注"
   },
   {
     "id": "zxcvb",
     "name": "ネダプラチン",
-    "purpose": "→症状の緩和"
+    "purpose": "頭頸部がん、非小細胞肺がん、泌尿生殖器がん",
+    "route": "点滴静注"
   },
   {
     "id": "poiuy",
     "name": "ゲムシタビン",
-    "purpose": "→症状の緩和"
+    "purpose": "膵がん、肺がん、膀胱がん",
+    "route": "点滴静注"
   },
   {
     "id": "lkjhg",
     "name": "塩酸イリノテカン",
-    "purpose": "→症状の緩和"
+    "purpose": "大腸がん、小細胞肺がん",
+    "route": "点滴静注"
   },
   {
     "id": "mnbvc",
     "name": "エルロチニブ",
-    "purpose": "→症状の緩和"
+    "purpose": "非小細胞肺がん、膵がん",
+    "route": "経口投与"
   }
 ]
