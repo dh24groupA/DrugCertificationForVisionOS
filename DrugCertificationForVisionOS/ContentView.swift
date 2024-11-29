@@ -434,6 +434,17 @@ struct ContentView: View {
                     
                     Button(action: {
                         setting = .title
+                        patientID = ""
+                        patientName = ""
+                        patientAge = ""
+                        patientMed = ""
+                        patientDose = ""
+                        patientTime = ""
+                        patientNote = ""
+                        medID = ""
+                        medName = ""
+                        medPurpose = ""
+                        medRoute = ""
                         
                     }) {
                         Text("最初から記録する")
