@@ -21,6 +21,9 @@ struct patient: Codable {
     var dose: String        //用量
     var time: String        //投与時間
     var note: String        //注意事項
+    var history: String     //既往歴
+    var allergy: String     //アレルゲン
+    var photo: String       //写真名
 }
 
 func loadJson<T: Codable>(fileName: String, type: T.Type) -> [T] {

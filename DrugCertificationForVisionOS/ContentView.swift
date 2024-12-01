@@ -37,11 +37,17 @@ struct ContentView: View {
     @State private var patientDose = ""
     @State private var patientTime = ""
     @State private var patientNote = ""
+    @State private var patientHistory = ""
+    @State private var patientAllergy = ""
+    @State private var patientPhoto = ""
     
     @State private var medID = ""
     @State private var medName = ""
     @State private var medPurpose = ""
     @State private var medRoute = ""
+    
+    @State private var lastDoseDate: Date? = nil//前回の記録日時
+    @State private var currentTime = Date() // 現在時刻を保持
     
     
     enum Setting {
@@ -73,6 +79,14 @@ struct ContentView: View {
                     .foregroundColor(.white)
                     .cornerRadius(10)
                 }
+                .onAppear {
+                    if let savedDate = loadLastDoseDate() {
+                        lastDoseDate = savedDate
+                    } else {
+                        lastDoseDate = nil // 記録がない場合
+                    }
+                }
+                
                 
             case .medAuth:
                 ZStack{
@@ -100,7 +114,7 @@ struct ContentView: View {
                             HStack{
                                 VStack{
                                     UIKitImageView(imageName: "MQR1")
-                                        .frame(width: 75, height: 75) // 表示サイズを指定
+                                        .frame(width: 75, height: 75)
                                         .padding(80)
                                     
                                     Button(action: {
@@ -114,7 +128,7 @@ struct ContentView: View {
                                 
                                 VStack{
                                     UIKitImageView(imageName: "MQR2")
-                                        .frame(width: 75, height: 75) // 表示サイズを指定
+                                        .frame(width: 75, height: 75)
                                         .padding(80)
                                     
                                     Button(action: {
@@ -128,7 +142,7 @@ struct ContentView: View {
                                 
                                 VStack{
                                     UIKitImageView(imageName: "MQR3")
-                                        .frame(width: 75, height: 75) // 表示サイズを指定
+                                        .frame(width: 75, height: 75)
                                         .padding(80)
                                     
                                     Button(action: {
@@ -143,7 +157,7 @@ struct ContentView: View {
                             HStack{
                                 VStack{
                                     UIKitImageView(imageName: "MQR4")
-                                        .frame(width: 75, height: 75) // 表示サイズを指定
+                                        .frame(width: 75, height: 75)
                                         .padding(80)
                                     
                                     Button(action: {
@@ -157,7 +171,7 @@ struct ContentView: View {
                                 
                                 VStack{
                                     UIKitImageView(imageName: "MQR5")
-                                        .frame(width: 75, height: 75) // 表示サイズを指定
+                                        .frame(width: 75, height: 75)
                                         .padding(80)
                                     
                                     Button(action: {
@@ -171,7 +185,7 @@ struct ContentView: View {
                                 
                                 VStack{
                                     UIKitImageView(imageName: "MQR6")
-                                        .frame(width: 75, height: 75) // 表示サイズを指定
+                                        .frame(width: 75, height: 75)
                                         .padding(80)
                                     
                                     Button(action: {
@@ -224,7 +238,7 @@ struct ContentView: View {
                         HStack{
                             VStack{
                                 UIKitImageView(imageName: "PQR1")
-                                    .frame(width: 75, height: 75) // 表示サイズを指定
+                                    .frame(width: 75, height: 75)
                                     .padding(80)
                                 
                                 Button(action: {
@@ -238,7 +252,7 @@ struct ContentView: View {
                             
                             VStack{
                                 UIKitImageView(imageName: "PQR2")
-                                    .frame(width: 75, height: 75) // 表示サイズを指定
+                                    .frame(width: 75, height: 75)
                                     .padding(80)
                                 
                                 Button(action: {
@@ -267,93 +281,98 @@ struct ContentView: View {
                     
                     patientNote = getJsonData(searchKey: "id", searchValue: pqrData, returnKey: "note", fileName: "patients", type: patient.self)
                     
-    
+                    patientHistory = getJsonData(searchKey: "id", searchValue: pqrData, returnKey: "history", fileName: "patients", type: patient.self)
+                    
+                    patientAllergy = getJsonData(searchKey: "id", searchValue: pqrData, returnKey: "allergy", fileName: "patients", type: patient.self)
+                    
+                    patientPhoto = getJsonData(searchKey: "id", searchValue: pqrData, returnKey: "photo", fileName: "patients", type: patient.self)
+                    
                 }
                 
                 
-
-                // scanned状態でのアラート表示部分を以下のように修正
-
-                case .scanned:
-                    ZStack {
-                        VStack {
-                            HStack {
-                                Button(action: {
-                                    setting = .patientAuth
-                                }) {
-                                    Text("scanned")
-                                }
-                                .padding(.leading)
-                                Spacer()
-                                
-                                Text("薬剤投与前最終確認")
-                                    .font(.largeTitle)
-                                    .bold()
-                                    .padding(.bottom)
-                                    .padding(.horizontal)
-                                
-                                Spacer()
-                                
-                                Button(role: .destructive) {
-                                    showFirstAlert = true  // 最初のアラートを表示
-                                } label: {
-                                    Label("投与予定の薬剤と選択された薬剤が一致しません", systemImage: "pencil.and.outline")
-                                }
-                                .alert("投与予定の薬剤と選択された薬剤が一致しません", isPresented: $showFirstAlert) {
-                                    Button("No") {}
-                                    Button("Yes") {
-                                        // 最初のアラートが閉じられた後、次のアラートを表示
-                                        showSecondAlert = true
-                                    }
-                                } message: {
-                                    Text("それでも投与記録を残しますか？")
-                                }
+                
+            case .scanned:
+                ZStack {
+                    VStack {
+                        HStack {
+                            Button(action: {
+                                setting = .patientAuth
+                            }) {
+                                Text("戻る")
                             }
-                            .padding()
+                            .padding(.leading)
                             Spacer()
                             
-                            HStack {
-                                VStack(alignment: .leading, spacing: 10) {
-                                    HStack {
-                                        Text("記録日:")
-                                        Text("\(formattedDate(recordDate))")
-                                            .onTapGesture {
-                                                withAnimation {
-                                                    showDatePicker.toggle()
-                                                }
-                                            }
-                                    }
-                                    Text("患者名: \(patientName.isEmpty ? "未入力" : patientName)")
-                                    Text("年齢: \(patientAge.isEmpty ? "未入力" : patientAge)")
-                                }
-                                .padding()
-                                
-                                VStack(alignment: .leading, spacing: 10) {
-                                    Text("投与すべき薬剤: \(patientMed.isEmpty ? "未入力" : patientMed)")
-                                    Text("投与する薬剤: \(medName.isEmpty ? "未入力" : medName)")
-                                    Text("投与方法: \(medRoute.isEmpty ? "未入力" : medRoute)")
-                                    Text("注意事項: \(patientNote.isEmpty ? "未入力" : patientNote)")
-                                }
+                            Text("薬剤投与前最終確認")
+                                .font(.largeTitle)
+                                .bold()
+                                .padding(.bottom)
+                                .padding(.horizontal)
+                            
+                            Spacer()
+                            
+                            Button(role: .destructive) {
+                                showFirstAlert = true  // 最初のアラートを表示
+                            } label: {
+                                Label("薬剤不一致", systemImage: "pencil.and.outline")
                             }
-                            .padding(.bottom, 0)
-                            .frame(maxWidth: .infinity, maxHeight: .infinity) // 親ビューを画面全体に
+                            .alert("投与予定の薬剤と選択された薬剤が一致しません", isPresented: $showFirstAlert) {
+                                Button("戻る") {}
+                                Button("QRコードを再読み込み") {
+                                    setting = .medAuth
+                                }
+                            } message: {
+                                Text("それでも投与記録を残しますか？")
+                            }
                         }
-                        .alert("本当に記録しますか？", isPresented: $showSecondAlert) { // 2番目のアラート
-                            Button("No") {}
-                            Button("Yes", action: {
-                                setting = .finished
-                            })
-                        } message: {
-                            Text("投与記録を完了しました。")
+                        .padding()
+                        Spacer()
+                        
+                        HStack {
+                            VStack(alignment: .leading, spacing: 10) {
+                                HStack {
+                                    Text("記録日:")
+                                    Text("\(formattedDate(currentTime))")
+                                        .onTapGesture {
+                                            withAnimation {
+                                                showDatePicker.toggle()
+                                            }
+                                        }
+                                }
+                                Text("前回投与日: \(formattedLastDoseDate(lastDoseDate))")
+                                UIKitImageView(imageName: patientPhoto)
+                                    .frame(width: 75, height: 75)
+                                    .padding(200)
+
+                                Text("患者名: \(patientName.isEmpty ? "未入力" : patientName)")
+                                Text("年齢: \(patientAge.isEmpty ? "未入力" : patientAge)")
+                                Text("既往歴: \(patientHistory.isEmpty ? "なし" : patientHistory)")
+                                Text("アレルギー情報: \(patientAllergy.isEmpty ? "なし" : patientAllergy)")
+                            }
+                            .padding()
+                            
+                            VStack(alignment: .leading, spacing: 10) {
+                                Text("処方薬: \(patientMed.isEmpty ? "未入力" : patientMed)")
+                                Text("投与薬剤: \(medName.isEmpty ? "未入力" : medName)")
+                                Text("投与方法: \(medRoute.isEmpty ? "未入力" : medRoute)")
+                                Text("注意事項: \(patientNote.isEmpty ? "未入力" : patientNote)")
+                            }
                         }
+                        .padding(.bottom, 0)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity) // 親ビューを画面全体に
                     }
-                    .onAppear{
-                        if cmpstr(str1: medName, str2: patientMed){
-                            setting = .scannedExact
-                        }else{
-                            setting = .scanned
-                        }
+                }
+                .onAppear{
+                    if cmpstr(str1: medName, str2: patientMed){
+                        setting = .scannedExact
+                    }else{
+                        setting = .scanned
                     }
+                    Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+                        currentTime = Date()
+                    }
+                    
+                }
                 
             case .scannedExact:
                 ZStack{
@@ -362,7 +381,7 @@ struct ContentView: View {
                             Button(action: {
                                 setting = .patientAuth
                             }) {
-                                Text("Exact")
+                                Text("戻る")
                             }
                             .padding(.leading)
                             Spacer()
@@ -378,12 +397,14 @@ struct ContentView: View {
                             Button(role: .destructive) {
                                 isShowAlert = true
                             } label: {
-                                Label("投与完了する", systemImage: "pencil.and.outline")
+                                Label("完了", systemImage: "pencil.and.outline")
                             }
                             .alert("本当に完了しますか？", isPresented: $isShowAlert) {
                                 Button("No") {}
                                 Button("Yes") {
                                     setting = .finished
+                                    lastDoseDate = Date()
+                                    saveLastDoseDate(lastDoseDate!)
                                 }
                             } message: {
                                 Text("完了すると看護記録に投与履歴が送信されます")
@@ -396,20 +417,28 @@ struct ContentView: View {
                             VStack(alignment: .leading, spacing: 10) {
                                 HStack {
                                     Text("記録日:")
-                                    Text("\(formattedDate(recordDate))")
+                                    Text("\(formattedDate(currentTime))")
                                         .onTapGesture {
                                             withAnimation {
                                                 showDatePicker.toggle()
                                             }
                                         }
                                 }
+                                Text("前回投与日: \(formattedLastDoseDate(lastDoseDate))")
+                                UIKitImageView(imageName: patientPhoto)
+                                    .frame(width: 75, height: 75)
+
+                                    .padding(200) // 画像の周囲に適度な余白を追加
+
                                 Text("患者名: \(patientName.isEmpty ? "未入力" : patientName)")
                                 Text("年齢: \(patientAge.isEmpty ? "未入力" : patientAge)")
+                                Text("既往歴: \(patientHistory.isEmpty ? "なし" : patientHistory)")
+                                Text("アレルギー情報: \(patientAllergy.isEmpty ? "なし" : patientAllergy)")
                             }
                             .padding()
                             
                             VStack(alignment: .leading, spacing: 10) {
-                                Text("投与する薬剤: \(patientMed.isEmpty ? "未入力" : patientMed)")
+                                Text("投与薬剤: \(patientMed.isEmpty ? "未入力" : patientMed)")
                                 Text("投与方法: \(medRoute.isEmpty ? "未入力" : medRoute)")
                                 Text("注意事項: \(patientNote.isEmpty ? "未入力" : patientNote)")
                             }
@@ -424,6 +453,9 @@ struct ContentView: View {
                         setting = .scannedExact
                     }else{
                         setting = .scanned
+                    }
+                    Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+                        currentTime = Date()
                     }
                 }
                 
@@ -459,7 +491,7 @@ struct ContentView: View {
 
 func formattedDate(_ date: Date) -> String {
     let formatter = DateFormatter()
-    formatter.dateFormat = "yy/MM/dd"
+    formatter.dateFormat = "yy/MM/dd HH:mm"
     return formatter.string(from: date)
 }
 

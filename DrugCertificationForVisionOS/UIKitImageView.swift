@@ -1,11 +1,4 @@
-//
-//  UIKitImageView.swift
-//  DrugCertificationForVisionOS
-//
-//  Created by 植松優羽 on 2024/11/26.
-//
 import SwiftUI
-
 
 struct UIKitImageView: UIViewRepresentable {
     let imageName: String
@@ -22,5 +15,9 @@ struct UIKitImageView: UIViewRepresentable {
         } else {
             print("Error: \(imageName) が見つかりません")
         }
+    }
+    
+    func sizeThatFits(in size: CGSize) -> CGSize? {
+        return size // 使用するサイズを返す
     }
 }
