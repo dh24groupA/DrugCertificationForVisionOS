@@ -298,12 +298,7 @@ struct ContentView: View {
                 ZStack {
                     VStack(alignment: .leading, spacing: 14) {
                         HStack {
-                            Button(action: {
-                                setting = .patientAuth
-                            }) {
-                                Text("戻る")
-                            }
-                            .padding(.leading)
+                            
                             Spacer()
                             
                             Text("薬剤投与前最終確認")
