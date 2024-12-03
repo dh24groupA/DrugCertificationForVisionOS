@@ -11,11 +11,8 @@ import AVFoundation
 import Vision
 
 struct ContentView: View {
-    @State private var showDatePicker = false
-    @State private var recordDate = Calendar.current.date(byAdding: .day, value: -1, to: Date()) ?? Date()
     @State var isShowAlert = false
     @State private var showFirstAlert = false
-    @State private var showSecondAlert = false
     @State var pqrData = ""
     @State var mqrData = ""
     
@@ -28,7 +25,6 @@ struct ContentView: View {
     @State var mqr4Data = "zxcvb"
     @State var mqr5Data = "qwert"
     @State var mqr6Data = "asdfg"
-    
     
     @State private var patientID = ""
     @State private var patientName = ""
@@ -62,7 +58,7 @@ struct ContentView: View {
         case finished
     }
     
-    @State private var setting = Setting.patientAuth
+    @State private var setting = Setting.title
     
     var body: some View {
         ZStack {
@@ -89,7 +85,6 @@ struct ContentView: View {
                         lastDoseDate = nil // 記録がない場合
                     }
                 }
-                
                 
             case .medAuth:
                 ZStack{
@@ -299,11 +294,9 @@ struct ContentView: View {
                     patientCurrentIllness = getJsonData(searchKey: "id", searchValue: pqrData, returnKey: "currentIllness", fileName: "patients", type: patient.self)
                 }
                 
-                
-                
             case .scanned:
-                ZStack{
-                    VStack(alignment: .leading, spacing: 16) {
+                ZStack {
+                    VStack(alignment: .leading, spacing: 14) {
                         HStack {
                             Button(action: {
                                 setting = .patientAuth
@@ -316,13 +309,11 @@ struct ContentView: View {
                             Text("薬剤投与前最終確認")
                                 .font(.largeTitle)
                                 .bold()
-                                .padding(.bottom)
                                 .padding(.horizontal)
                             
                             Spacer()
                             
-                            if cmpstr(str1: medName, str2: patientMed){
-                                
+                            if cmpstr(str1: medName, str2: patientMed) {
                                 Button(role: .destructive) {
                                     isShowAlert = true
                                 } label: {
@@ -338,16 +329,14 @@ struct ContentView: View {
                                 } message: {
                                     Text("完了すると看護記録に投与履歴が送信されます")
                                 }
-                                
-                            }else{
-                                
+                            } else {
                                 Button(role: .destructive) {
-                                    showFirstAlert = true  // 最初のアラートを表示
+                                    showFirstAlert = true
                                 } label: {
                                     Label("薬剤不一致", systemImage: "pencil.and.outline")
                                 }
                                 .alert("投与予定の薬剤と選択された薬剤が一致しません", isPresented: $showFirstAlert) {
-                                    Button("戻る") {print(medName+"\n"+patientMed)}
+                                    Button("戻る") {}
                                     Button("QRコードを再読み込み") {
                                         setting = .medAuth
                                     }
@@ -355,18 +344,18 @@ struct ContentView: View {
                             }
                         }
                         .padding()
-                        Spacer()
                         
-                        HStack{
+                        Divider()
+                        
+                        HStack(alignment: .top) {
                             VStack(alignment: .leading, spacing: 16) {
-                                // 患者セクション
                                 Section(header: Text("患者情報")
                                     .font(.headline)
                                     .foregroundColor(.gray)) {
                                         UIKitImageView(imageName: patientPhoto)
-                                            .frame(width: 30, height: 30)
-                                        
-                                            .padding(150) // 画像の周囲に適度な余白を追加
+                                            .frame(width: 100, height: 100)
+                                            .padding([.bottom,.leading], 120)
+                                            .padding(.top,100)
                                         
                                         HStack {
                                             Text("患者名:")
@@ -412,9 +401,7 @@ struct ContentView: View {
                                     }
                             }
                             Divider()
-                            
-                            VStack(alignment: .leading, spacing: 16){
-                                // 記録セクション
+                            VStack(alignment: .leading, spacing: 16) {
                                 Section(header: Text("記録情報")
                                     .font(.headline)
                                     .foregroundColor(.gray)) {
@@ -434,56 +421,80 @@ struct ContentView: View {
                                 
                                 Divider()
                                 
-                                // 投与薬剤セクション
                                 Section(header: Text("投与薬剤")
                                     .font(.headline)
                                     .foregroundColor(.gray)) {
-                                        HStack {
-                                            Text("薬剤名:")
-                                                .fontWeight(.bold)
-                                                .foregroundColor(.secondary)
-                                            Text("\(medName.isEmpty ? "未入力" : medName)")
+                                        
+                                        if(cmpstr(str1: medName, str2: patientMed)){
+                                            VStack(alignment: .leading, spacing: 16){
+                                                HStack {
+                                                    Text("薬剤名:")
+                                                        .fontWeight(.bold)
+                                                        .foregroundColor(.secondary)
+                                                    Text("\(medName.isEmpty ? "未入力" : medName)")
+                                                }
+                                                    HStack {
+                                                        Text("用途:")
+                                                            .fontWeight(.bold)
+                                                            .foregroundColor(.secondary)
+                                                        Text("\(medPurpose.isEmpty ? "未入力" : medPurpose)")
+                                                    }
+                                                    HStack {
+                                                        Text("副作用:")
+                                                            .fontWeight(.bold)
+                                                            .foregroundColor(.secondary)
+                                                        Text("\(medSideEffects.isEmpty ? "未入力" : medSideEffects)")
+                                                    }
+                                                    HStack {
+                                                        Text("投与方法:")
+                                                            .fontWeight(.bold)
+                                                            .foregroundColor(.secondary)
+                                                        Text("\(medRoute.isEmpty ? "未入力" : medRoute)")
+                                                    }
+                                                    HStack {
+                                                        Text("投与頻度:")
+                                                            .fontWeight(.bold)
+                                                            .foregroundColor(.secondary)
+                                                        Text("\(medFrequency.isEmpty ? "未入力" : medFrequency)")
+                                                    }
+                                                    HStack {
+                                                        Text("禁忌:")
+                                                            .fontWeight(.bold)
+                                                            .foregroundColor(.red)
+                                                        Text("\(medContraindications.isEmpty ? "未入力" : medContraindications)")
+                                                    }
+                                                }
+                                        }else{
+                                            VStack(alignment: .leading, spacing: 16){
+                                                HStack {
+                                                    Text("処方薬剤:")
+                                                        .fontWeight(.bold)
+                                                        .foregroundColor(.secondary)
+                                                    Text("\(medName.isEmpty ? "未入力" : medName)")
+                                                        .foregroundColor(.red)
+                                                    
+                                                }
+                                                HStack {
+                                                    Text("読み込んだ薬剤:")
+                                                        .fontWeight(.bold)
+                                                        .foregroundColor(.secondary)
+                                                    Text("\(patientMed.isEmpty ? "未入力" : patientMed)")
+                                                        .foregroundColor(.red)
+                                                }
+                                            }
                                         }
-                                        HStack {
-                                            Text("用途:")
-                                                .fontWeight(.bold)
-                                                .foregroundColor(.secondary)
-                                            Text("\(medPurpose.isEmpty ? "未入力" : medPurpose)")
-                                        }
-                                        HStack {
-                                            Text("副作用:")
-                                                .fontWeight(.bold)
-                                                .foregroundColor(.secondary)
-                                            Text("\(medSideEffects.isEmpty ? "未入力" : medSideEffects)")
-                                        }
-                                        HStack {
-                                            Text("投与方法:")
-                                                .fontWeight(.bold)
-                                                .foregroundColor(.secondary)
-                                            Text("\(medRoute.isEmpty ? "未入力" : medRoute)")
-                                        }
-                                        HStack {
-                                            Text("投与頻度:")
-                                                .fontWeight(.bold)
-                                                .foregroundColor(.secondary)
-                                            Text("\(medFrequency.isEmpty ? "未入力" : medFrequency)")
-                                        }
-                                        HStack {
-                                            Text("禁忌:")
-                                                .fontWeight(.bold)
-                                                .foregroundColor(.red)
-                                            Text("\(medContraindications.isEmpty ? "未入力" : medContraindications)")
-                                        }
+                                        
                                     }
                             }
                         }
+                        .padding()
                     }
-                    .padding()
-                    .background(Color(.systemGroupedBackground)) // 背景色でセクションを強調
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top) // 全体を上寄せ
+                    .background(Color(.systemGroupedBackground))
                     .cornerRadius(10)
                     .shadow(radius: 5)
-                    
                 }
+                
                 .onAppear{
                     Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
                         currentTime = Date()
