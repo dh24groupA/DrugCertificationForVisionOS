@@ -11,6 +11,9 @@ struct medicine: Codable {
     var name: String        //薬品名
     var purpose: String     //投与目的
     var route: String       //投与方法
+    var frequency: String //投与頻度
+    var sideEffects: String//副作用
+    var contraindications: String//禁忌事項
 }
 
 struct patient: Codable {

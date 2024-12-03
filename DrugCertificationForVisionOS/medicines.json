@@ -3,36 +3,54 @@
     "id": "asdfg",
     "name": "シスプラチン",
     "purpose": "固形腫瘍（肺がん、胃がん、泌尿生殖器がんなど）",
-    "route": "点滴静注"
+    "route": "点滴静注",
+    "frequency": "3～4週間ごとに1回",
+    "sideEffects": "腎機能障害、吐き気、嘔吐、骨髄抑制",
+    "contraindications": "腎不全患者、妊娠中の患者への使用は禁忌"
   },
   {
     "id": "qwert",
     "name": "カルボプラチン",
     "purpose": "肺がん、卵巣がん、頭頸部がん",
-    "route": "点滴静注"
+    "route": "点滴静注",
+    "frequency": "3～4週間ごとに1回",
+    "sideEffects": "骨髄抑制、アレルギー反応、吐き気",
+    "contraindications": "骨髄抑制が顕著な患者、妊娠中の患者への使用は禁忌"
   },
   {
     "id": "zxcvb",
     "name": "ネダプラチン",
     "purpose": "頭頸部がん、非小細胞肺がん、泌尿生殖器がん",
-    "route": "点滴静注"
+    "route": "点滴静注",
+    "frequency": "3～4週間ごとに1回",
+    "sideEffects": "骨髄抑制、吐き気、腎機能障害",
+    "contraindications": "腎機能不全患者、妊娠中の患者への使用は禁忌"
   },
   {
     "id": "poiuy",
     "name": "ゲムシタビン",
     "purpose": "膵がん、肺がん、膀胱がん",
-    "route": "点滴静注"
+    "route": "点滴静注",
+    "frequency": "1週間ごとに投与、3週投与後1週休薬",
+    "sideEffects": "骨髄抑制、肝機能障害、疲労感",
+    "contraindications": "重篤な骨髄抑制患者、妊娠中の患者への使用は禁忌"
   },
   {
     "id": "lkjhg",
     "name": "塩酸イリノテカン",
     "purpose": "大腸がん、小細胞肺がん",
-    "route": "点滴静注"
+    "route": "点滴静注",
+    "frequency": "週1回または2週間ごとに1回",
+    "sideEffects": "下痢（遅発性下痢含む）、白血球減少、脱毛",
+    "contraindications": "腸閉塞患者、妊娠中の患者への使用は禁忌"
   },
   {
     "id": "mnbvc",
     "name": "エルロチニブ",
     "purpose": "非小細胞肺がん、膵がん",
-    "route": "経口投与"
+    "route": "経口投与",
+    "frequency": "1日1回",
+    "sideEffects": "皮膚障害（発疹など）、下痢、間質性肺炎",
+    "contraindications": "間質性肺炎の既往歴がある患者への使用は慎重に行う"
   }
 ]

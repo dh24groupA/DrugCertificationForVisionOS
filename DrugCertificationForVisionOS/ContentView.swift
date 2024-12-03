@@ -40,11 +40,15 @@ struct ContentView: View {
     @State private var patientHistory = ""
     @State private var patientAllergy = ""
     @State private var patientPhoto = ""
+    @State private var patientCurrentIllness = ""
     
     @State private var medID = ""
     @State private var medName = ""
     @State private var medPurpose = ""
     @State private var medRoute = ""
+    @State private var medFrequency = ""
+    @State private var medSideEffects = ""
+    @State private var medContraindications = ""
     
     @State private var lastDoseDate: Date? = nil//前回の記録日時
     @State private var currentTime = Date() // 現在時刻を保持
@@ -55,11 +59,10 @@ struct ContentView: View {
         case medAuth
         case patientAuth
         case scanned
-        case scannedExact
         case finished
     }
     
-    @State private var setting = Setting.title
+    @State private var setting = Setting.patientAuth
     
     var body: some View {
         ZStack {
@@ -211,6 +214,12 @@ struct ContentView: View {
                     
                     medRoute = getJsonData(searchKey: "id", searchValue: mqrData, returnKey: "route", fileName: "medicines", type: medicine.self)
                     
+                    medFrequency = getJsonData(searchKey: "id", searchValue: mqrData, returnKey: "frequency", fileName: "medicines", type: medicine.self)
+                    
+                    medSideEffects = getJsonData(searchKey: "id", searchValue: mqrData, returnKey: "sideEffects", fileName: "medicines", type: medicine.self)
+                    
+                    medContraindications = getJsonData(searchKey: "id", searchValue: mqrData, returnKey: "contraindications", fileName: "medicines", type: medicine.self)
+                    
                 }
                 
             case .patientAuth:
@@ -287,13 +296,14 @@ struct ContentView: View {
                     
                     patientPhoto = getJsonData(searchKey: "id", searchValue: pqrData, returnKey: "photo", fileName: "patients", type: patient.self)
                     
+                    patientCurrentIllness = getJsonData(searchKey: "id", searchValue: pqrData, returnKey: "currentIllness", fileName: "patients", type: patient.self)
                 }
                 
                 
                 
             case .scanned:
-                ZStack {
-                    VStack {
+                ZStack{
+                    VStack(alignment: .leading, spacing: 16) {
                         HStack {
                             Button(action: {
                                 setting = .patientAuth
@@ -311,149 +321,170 @@ struct ContentView: View {
                             
                             Spacer()
                             
-                            Button(role: .destructive) {
-                                showFirstAlert = true  // 最初のアラートを表示
-                            } label: {
-                                Label("薬剤不一致", systemImage: "pencil.and.outline")
-                            }
-                            .alert("投与予定の薬剤と選択された薬剤が一致しません", isPresented: $showFirstAlert) {
-                                Button("戻る") {}
-                                Button("QRコードを再読み込み") {
-                                    setting = .medAuth
+                            if cmpstr(str1: medName, str2: patientMed){
+                                
+                                Button(role: .destructive) {
+                                    isShowAlert = true
+                                } label: {
+                                    Label("完了", systemImage: "pencil.and.outline")
                                 }
-                            } message: {
-                                Text("それでも投与記録を残しますか？")
+                                .alert("本当に完了しますか？", isPresented: $isShowAlert) {
+                                    Button("No") {}
+                                    Button("Yes") {
+                                        setting = .finished
+                                        lastDoseDate = Date()
+                                        saveLastDoseDate(lastDoseDate!)
+                                    }
+                                } message: {
+                                    Text("完了すると看護記録に投与履歴が送信されます")
+                                }
+                                
+                            }else{
+                                
+                                Button(role: .destructive) {
+                                    showFirstAlert = true  // 最初のアラートを表示
+                                } label: {
+                                    Label("薬剤不一致", systemImage: "pencil.and.outline")
+                                }
+                                .alert("投与予定の薬剤と選択された薬剤が一致しません", isPresented: $showFirstAlert) {
+                                    Button("戻る") {print(medName+"\n"+patientMed)}
+                                    Button("QRコードを再読み込み") {
+                                        setting = .medAuth
+                                    }
+                                }
                             }
                         }
                         .padding()
                         Spacer()
                         
-                        HStack {
-                            VStack(alignment: .leading, spacing: 10) {
-                                HStack {
-                                    Text("記録日:")
-                                    Text("\(formattedDate(currentTime))")
-                                        .onTapGesture {
-                                            withAnimation {
-                                                showDatePicker.toggle()
-                                            }
+                        HStack{
+                            VStack(alignment: .leading, spacing: 16) {
+                                // 患者セクション
+                                Section(header: Text("患者情報")
+                                    .font(.headline)
+                                    .foregroundColor(.gray)) {
+                                        UIKitImageView(imageName: patientPhoto)
+                                            .frame(width: 30, height: 30)
+                                        
+                                            .padding(150) // 画像の周囲に適度な余白を追加
+                                        
+                                        HStack {
+                                            Text("患者名:")
+                                                .fontWeight(.bold)
+                                                .foregroundColor(.secondary)
+                                            Text("\(patientName.isEmpty ? "未入力" : patientName)")
                                         }
-                                }
-                                Text("前回投与日: \(formattedLastDoseDate(lastDoseDate))")
-                                UIKitImageView(imageName: patientPhoto)
-                                    .frame(width: 75, height: 75)
-                                    .padding(200)
-
-                                Text("患者名: \(patientName.isEmpty ? "未入力" : patientName)")
-                                Text("年齢: \(patientAge.isEmpty ? "未入力" : patientAge)")
-                                Text("既往歴: \(patientHistory.isEmpty ? "なし" : patientHistory)")
-                                Text("アレルギー情報: \(patientAllergy.isEmpty ? "なし" : patientAllergy)")
+                                        
+                                        HStack {
+                                            Text("年齢:")
+                                                .fontWeight(.bold)
+                                                .foregroundColor(.secondary)
+                                            Text("\(patientAge.isEmpty ? "未入力" : patientAge)")
+                                        }
+                                        
+                                        HStack {
+                                            Text("病名:")
+                                                .fontWeight(.bold)
+                                                .foregroundColor(.secondary)
+                                            Text("\(patientCurrentIllness.isEmpty ? "未入力" : patientCurrentIllness)")
+                                        }
+                                        
+                                        HStack {
+                                            Text("既往歴:")
+                                                .fontWeight(.bold)
+                                                .foregroundColor(.secondary)
+                                            Text("\(patientHistory.isEmpty ? "未入力" : patientHistory)")
+                                        }
+                                        
+                                        HStack {
+                                            Text("アレルギー情報:")
+                                                .fontWeight(.bold)
+                                                .foregroundColor(.secondary)
+                                            Text("\(patientAllergy.isEmpty ? "未入力" : patientAllergy)")
+                                        }
+                                        
+                                        HStack {
+                                            Text("注意事項:")
+                                                .fontWeight(.bold)
+                                                .foregroundColor(.secondary)
+                                            Text("\(patientNote.isEmpty ? "未入力" : patientNote)")
+                                        }
+                                    }
                             }
-                            .padding()
+                            Divider()
                             
-                            VStack(alignment: .leading, spacing: 10) {
-                                Text("処方薬: \(patientMed.isEmpty ? "未入力" : patientMed)")
-                                Text("投与薬剤: \(medName.isEmpty ? "未入力" : medName)")
-                                Text("投与方法: \(medRoute.isEmpty ? "未入力" : medRoute)")
-                                Text("注意事項: \(patientNote.isEmpty ? "未入力" : patientNote)")
+                            VStack(alignment: .leading, spacing: 16){
+                                // 記録セクション
+                                Section(header: Text("記録情報")
+                                    .font(.headline)
+                                    .foregroundColor(.gray)) {
+                                        HStack {
+                                            Text("記録日:")
+                                                .fontWeight(.bold)
+                                                .foregroundColor(.secondary)
+                                            Text("\(formattedDate(currentTime))")
+                                        }
+                                        HStack {
+                                            Text("前回投与日:")
+                                                .fontWeight(.bold)
+                                                .foregroundColor(.secondary)
+                                            Text("\(formattedLastDoseDate(lastDoseDate))")
+                                        }
+                                    }
+                                
+                                Divider()
+                                
+                                // 投与薬剤セクション
+                                Section(header: Text("投与薬剤")
+                                    .font(.headline)
+                                    .foregroundColor(.gray)) {
+                                        HStack {
+                                            Text("薬剤名:")
+                                                .fontWeight(.bold)
+                                                .foregroundColor(.secondary)
+                                            Text("\(medName.isEmpty ? "未入力" : medName)")
+                                        }
+                                        HStack {
+                                            Text("用途:")
+                                                .fontWeight(.bold)
+                                                .foregroundColor(.secondary)
+                                            Text("\(medPurpose.isEmpty ? "未入力" : medPurpose)")
+                                        }
+                                        HStack {
+                                            Text("副作用:")
+                                                .fontWeight(.bold)
+                                                .foregroundColor(.secondary)
+                                            Text("\(medSideEffects.isEmpty ? "未入力" : medSideEffects)")
+                                        }
+                                        HStack {
+                                            Text("投与方法:")
+                                                .fontWeight(.bold)
+                                                .foregroundColor(.secondary)
+                                            Text("\(medRoute.isEmpty ? "未入力" : medRoute)")
+                                        }
+                                        HStack {
+                                            Text("投与頻度:")
+                                                .fontWeight(.bold)
+                                                .foregroundColor(.secondary)
+                                            Text("\(medFrequency.isEmpty ? "未入力" : medFrequency)")
+                                        }
+                                        HStack {
+                                            Text("禁忌:")
+                                                .fontWeight(.bold)
+                                                .foregroundColor(.red)
+                                            Text("\(medContraindications.isEmpty ? "未入力" : medContraindications)")
+                                        }
+                                    }
                             }
                         }
-                        .padding(.bottom, 0)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity) // 親ビューを画面全体に
                     }
-                }
-                .onAppear{
-                    if cmpstr(str1: medName, str2: patientMed){
-                        setting = .scannedExact
-                    }else{
-                        setting = .scanned
-                    }
-                    Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
-                        currentTime = Date()
-                    }
+                    .padding()
+                    .background(Color(.systemGroupedBackground)) // 背景色でセクションを強調
+                    .cornerRadius(10)
+                    .shadow(radius: 5)
                     
                 }
-                
-            case .scannedExact:
-                ZStack{
-                    VStack {
-                        HStack {
-                            Button(action: {
-                                setting = .patientAuth
-                            }) {
-                                Text("戻る")
-                            }
-                            .padding(.leading)
-                            Spacer()
-                            
-                            Text("薬剤投与前最終確認")
-                                .font(.largeTitle)
-                                .bold()
-                                .padding(.bottom)
-                                .padding(.horizontal)
-                            
-                            Spacer()
-                            
-                            Button(role: .destructive) {
-                                isShowAlert = true
-                            } label: {
-                                Label("完了", systemImage: "pencil.and.outline")
-                            }
-                            .alert("本当に完了しますか？", isPresented: $isShowAlert) {
-                                Button("No") {}
-                                Button("Yes") {
-                                    setting = .finished
-                                    lastDoseDate = Date()
-                                    saveLastDoseDate(lastDoseDate!)
-                                }
-                            } message: {
-                                Text("完了すると看護記録に投与履歴が送信されます")
-                            }
-                        }
-                        .padding()
-                        Spacer()
-                        
-                        HStack {
-                            VStack(alignment: .leading, spacing: 10) {
-                                HStack {
-                                    Text("記録日:")
-                                    Text("\(formattedDate(currentTime))")
-                                        .onTapGesture {
-                                            withAnimation {
-                                                showDatePicker.toggle()
-                                            }
-                                        }
-                                }
-                                Text("前回投与日: \(formattedLastDoseDate(lastDoseDate))")
-                                UIKitImageView(imageName: patientPhoto)
-                                    .frame(width: 75, height: 75)
-
-                                    .padding(200) // 画像の周囲に適度な余白を追加
-
-                                Text("患者名: \(patientName.isEmpty ? "未入力" : patientName)")
-                                Text("年齢: \(patientAge.isEmpty ? "未入力" : patientAge)")
-                                Text("既往歴: \(patientHistory.isEmpty ? "なし" : patientHistory)")
-                                Text("アレルギー情報: \(patientAllergy.isEmpty ? "なし" : patientAllergy)")
-                            }
-                            .padding()
-                            
-                            VStack(alignment: .leading, spacing: 10) {
-                                Text("投与薬剤: \(patientMed.isEmpty ? "未入力" : patientMed)")
-                                Text("投与方法: \(medRoute.isEmpty ? "未入力" : medRoute)")
-                                Text("注意事項: \(patientNote.isEmpty ? "未入力" : patientNote)")
-                            }
-                        }
-                        .padding(.bottom, 0)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity) // 親ビューを画面全体に
-                        
-                    }
-                }
-                .onAppear {
-                    if cmpstr(str1: medName, str2: patientMed){
-                        setting = .scannedExact
-                    }else{
-                        setting = .scanned
-                    }
+                .onAppear{
                     Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
                         currentTime = Date()
                     }
@@ -466,17 +497,6 @@ struct ContentView: View {
                     
                     Button(action: {
                         setting = .title
-                        patientID = ""
-                        patientName = ""
-                        patientAge = ""
-                        patientMed = ""
-                        patientDose = ""
-                        patientTime = ""
-                        patientNote = ""
-                        medID = ""
-                        medName = ""
-                        medPurpose = ""
-                        medRoute = ""
                         
                     }) {
                         Text("最初から記録する")
@@ -491,7 +511,7 @@ struct ContentView: View {
 
 func formattedDate(_ date: Date) -> String {
     let formatter = DateFormatter()
-    formatter.dateFormat = "yy/MM/dd HH:mm"
+    formatter.dateFormat = "yyyy/MM/dd HH:mm"
     return formatter.string(from: date)
 }
 

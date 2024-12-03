@@ -9,7 +9,8 @@
     "note": "腎機能障害に注意。十分な水分補給を行い、腎毒性を防止する。",
     "history": "高血圧",
     "allergy": "なし",
-    "photo": "P1"
+    "photo": "P1",
+    "currentIllness": "肺がん"
   },
   {
     "id": "20001",
@@ -21,7 +22,8 @@
     "note": "骨髄抑制が生じる可能性があるため、血液検査を定期的に行う。",
     "history": "糖尿病",
     "allergy": "ピーナッツ",
-    "photo": "P2"
+    "photo": "P2",
+    "currentIllness": "卵巣がん"
   },
   {
     "id": "20002",
@@ -33,7 +35,8 @@
     "note": "アレルギー反応に注意。初回投与時には患者を観察する。",
     "history": "気管支喘息",
     "allergy": "猫",
-    "photo": "P3"
+    "photo": "P3",
+    "currentIllness": "食道がん"
   },
   {
     "id": "20003",
@@ -45,7 +48,8 @@
     "note": "発熱性好中球減少症を予防するため、免疫抑制を管理する。",
     "history": "特になし",
     "allergy": "卵",
-    "photo": "P4"
+    "photo": "P4",
+    "currentIllness": "膵臓がん"
   },
   {
     "id": "20004",
@@ -57,7 +61,8 @@
     "note": "下痢（急性および遅発性）が起こり得るため、ロペラミドなどで管理する。",
     "history": "胃潰瘍",
     "allergy": "ハウスダスト",
-    "photo": "P5"
+    "photo": "P5",
+    "currentIllness": "大腸がん"
   },
   {
     "id": "20005",
@@ -69,6 +74,7 @@
     "note": "皮膚障害が一般的に生じるため、適切なスキンケアを行う。",
     "history": "慢性腎疾患",
     "allergy": "甲殻類",
-    "photo": "P6"
+    "photo": "P6",
+    "currentIllness": "非小細胞肺がん"
   }
 ]
