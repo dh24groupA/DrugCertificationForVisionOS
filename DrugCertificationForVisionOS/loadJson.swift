@@ -27,6 +27,7 @@ struct patient: Codable {
     var history: String     //既往歴
     var allergy: String     //アレルゲン
     var photo: String       //写真名
+    var currentIllness: String //病名
 }
 
 func loadJson<T: Codable>(fileName: String, type: T.Type) -> [T] {
