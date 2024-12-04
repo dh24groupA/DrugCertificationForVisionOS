@@ -306,7 +306,7 @@ struct ContentView: View {
                                         
                                         VStack(alignment: .leading, spacing: 16){
                                             HStack {
-                                                Text("薬剤名:")
+                                                Text("処方薬剤:")
                                                     .fontWeight(.bold)
                                                     .foregroundColor(.secondary)
                                                 Text("\(medName.isEmpty ? "未入力" : medName)")
