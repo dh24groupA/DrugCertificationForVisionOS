@@ -108,12 +108,12 @@ struct ContentView: View {
                         VStack{
                             HStack{
                                 VStack{
-                                    UIKitImageView(imageName: "MQR1")
+                                    UIKitImageView(imageName: "MQR6")
                                         .frame(width: 75, height: 75)
                                         .padding(80)
                                     
                                     Button(action: {
-                                        mqrData = mqr1Data
+                                        mqrData = mqr6Data
                                         setting = .patientAuth
                                     }) {
                                         Text("このコードを選ぶ")
@@ -122,12 +122,12 @@ struct ContentView: View {
                                 .padding(.trailing,100)
                                 
                                 VStack{
-                                    UIKitImageView(imageName: "MQR2")
+                                    UIKitImageView(imageName: "MQR5")
                                         .frame(width: 75, height: 75)
                                         .padding(80)
                                     
                                     Button(action: {
-                                        mqrData = mqr2Data
+                                        mqrData = mqr5Data
                                         setting = .patientAuth
                                     }) {
                                         Text("このコードを選ぶ")
@@ -165,12 +165,12 @@ struct ContentView: View {
                                 .padding(.trailing,100)
                                 
                                 VStack{
-                                    UIKitImageView(imageName: "MQR5")
+                                    UIKitImageView(imageName: "MQR2")
                                         .frame(width: 75, height: 75)
                                         .padding(80)
                                     
                                     Button(action: {
-                                        mqrData = mqr5Data
+                                        mqrData = mqr2Data
                                         setting = .patientAuth
                                     }) {
                                         Text("このコードを選ぶ")
@@ -179,12 +179,12 @@ struct ContentView: View {
                                 .padding(.trailing,100)
                                 
                                 VStack{
-                                    UIKitImageView(imageName: "MQR6")
+                                    UIKitImageView(imageName: "MQR1")
                                         .frame(width: 75, height: 75)
                                         .padding(80)
                                     
                                     Button(action: {
-                                        mqrData = mqr6Data
+                                        mqrData = mqr1Data
                                         setting = .patientAuth
                                     }) {
                                         Text("このコードを選ぶ")
