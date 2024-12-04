@@ -404,12 +404,12 @@ struct ContentView: View {
                                     .font(.headline)
                                     .foregroundColor(.gray)) {
                                         HStack {
-                                            Text("記録日時:")
+                                            Text("記録日時　　　　　:")
                                                 .fontWeight(.bold)
                                                 .foregroundColor(.secondary)
                                             Text("\(formattedDate(currentTime))")
                                         }
-                                        HStack {
+                                        HStack(alignment: .top) {
                                             Text("過去3回の記録日時:")
                                                 .fontWeight(.bold)
                                                 .foregroundColor(.secondary)
