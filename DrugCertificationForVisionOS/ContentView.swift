@@ -413,10 +413,13 @@ struct ContentView: View {
                                             Text("過去3回の記録日時:")
                                                 .fontWeight(.bold)
                                                 .foregroundColor(.secondary)
-                                            ForEach(pastDates.prefix(3), id: \.self) { date in
-                                                Text(formattedLastDoseDate(date),"\n")
-                                                    .foregroundColor(.secondary)
+                                            VStack(alignment: .leading, spacing: 10) {
+                                                ForEach(pastDates.suffix(3), id: \.self) { date in
+                                                    Text(formattedLastDoseDate(date))
+                                                        .padding(.bottom, 5) // 各テキストの間に少し余白を追加
+                                                }
                                             }
+
                                         }
                                     }
                                 
