@@ -26,7 +26,7 @@ struct ContentView: View {
     @State var mqr5Data = "qwert"
     @State var mqr6Data = "asdfg"
     
-    @State private var patientID = ""
+    @State private var patientID = "20000"
     @State private var patientName = ""
     @State private var patientAge = ""
     @State private var patientMed = ""
@@ -38,7 +38,7 @@ struct ContentView: View {
     @State private var patientPhoto = ""
     @State private var patientCurrentIllness = ""
     
-    @State private var medID = ""
+    @State private var medID = "asdfg"
     @State private var medName = ""
     @State private var medPurpose = ""
     @State private var medRoute = ""
@@ -63,6 +63,7 @@ struct ContentView: View {
     var body: some View {
         ZStack {
             switch setting {
+                
             case .title:
                 VStack {
                     Text("薬剤認証")
@@ -83,135 +84,33 @@ struct ContentView: View {
                 }
                 
             case .medAuth:
-                ZStack{
-                    VStack {
-                        HStack {
-                            Button(action: {
-                                setting = .title
-                            }) {
-                                Text("戻る")
+                ZStack {
+                        VStack {
+                            HStack {
+                                Button(action: {
+                                    setting = .title
+                                }) {
+                                    Text("戻る")
+                                }
+                                .padding(.leading)
+                                Spacer()
+                                
+                                Text("薬剤選択画面")
+                                    .font(.largeTitle)
+                                    .fontWeight(.bold)
+                                    .frame(maxWidth: .infinity, alignment: .top)
+                                    .padding(.trailing, 100) //微調整
                             }
-                            .padding(.leading)
+                            .padding()
                             Spacer()
-                            
-                            Text("薬剤選択画面")
-                                .font(.largeTitle)
-                                .fontWeight(.bold)
-                                .frame(maxWidth: .infinity, alignment: .top)
-                                .padding(.trailing,100)//微調整
-                            
-                        }
-                        .padding()
-                        Spacer()
-                        
-                        VStack{
-                            HStack{
-                                VStack{
-                                    UIKitImageView(imageName: "MQR6")
-                                        .frame(width: 75, height: 75)
-                                        .padding(80)
-                                    
-                                    Button(action: {
-                                        mqrData = mqr6Data
-                                        setting = .patientAuth
-                                    }) {
-                                        Text("このコードを選ぶ")
-                                    }
-                                }
-                                .padding(.trailing,100)
-                                
-                                VStack{
-                                    UIKitImageView(imageName: "MQR5")
-                                        .frame(width: 75, height: 75)
-                                        .padding(80)
-                                    
-                                    Button(action: {
-                                        mqrData = mqr5Data
-                                        setting = .patientAuth
-                                    }) {
-                                        Text("このコードを選ぶ")
-                                    }
-                                }
-                                .padding(.trailing,100)
-                                
-                                VStack{
-                                    UIKitImageView(imageName: "MQR3")
-                                        .frame(width: 75, height: 75)
-                                        .padding(80)
-                                    
-                                    Button(action: {
-                                        mqrData = mqr3Data
-                                        setting = .patientAuth
-                                    }) {
-                                        Text("このコードを選ぶ")
-                                    }
-                                }
-                            }
-                            
-                            HStack{
-                                VStack{
-                                    UIKitImageView(imageName: "MQR4")
-                                        .frame(width: 75, height: 75)
-                                        .padding(80)
-                                    
-                                    Button(action: {
-                                        mqrData = mqr4Data
-                                        setting = .patientAuth
-                                    }) {
-                                        Text("このコードを選ぶ")
-                                    }
-                                }
-                                .padding(.trailing,100)
-                                
-                                VStack{
-                                    UIKitImageView(imageName: "MQR2")
-                                        .frame(width: 75, height: 75)
-                                        .padding(80)
-                                    
-                                    Button(action: {
-                                        mqrData = mqr2Data
-                                        setting = .patientAuth
-                                    }) {
-                                        Text("このコードを選ぶ")
-                                    }
-                                }
-                                .padding(.trailing,100)
-                                
-                                VStack{
-                                    UIKitImageView(imageName: "MQR1")
-                                        .frame(width: 75, height: 75)
-                                        .padding(80)
-                                    
-                                    Button(action: {
-                                        mqrData = mqr1Data
-                                        setting = .patientAuth
-                                    }) {
-                                        Text("このコードを選ぶ")
-                                    }
-                                }
-                            }
-                            .padding(.bottom)
                         }
                     }
-                }
-                .onAppear {
-                    
-                    
-                }
-                .onDisappear{
-                    medName = getJsonData(searchKey: "id", searchValue: mqrData, returnKey: "name", fileName: "medicines", type: medicine.self)
-                    
-                    medPurpose = getJsonData(searchKey: "id", searchValue: mqrData, returnKey: "purpose", fileName: "medicines", type: medicine.self)
-                    
-                    medRoute = getJsonData(searchKey: "id", searchValue: mqrData, returnKey: "route", fileName: "medicines", type: medicine.self)
-                    
-                    medFrequency = getJsonData(searchKey: "id", searchValue: mqrData, returnKey: "frequency", fileName: "medicines", type: medicine.self)
-                    
-                    medSideEffects = getJsonData(searchKey: "id", searchValue: mqrData, returnKey: "sideEffects", fileName: "medicines", type: medicine.self)
-                    
-                    medContraindications = getJsonData(searchKey: "id", searchValue: mqrData, returnKey: "contraindications", fileName: "medicines", type: medicine.self)
-                    
-                }
+                    .onAppear {
+                        // 3秒後に setting を更新
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                            setting = .patientAuth
+                        }
+                    }
                 
             case .patientAuth:
                 ZStack{
@@ -235,35 +134,12 @@ struct ContentView: View {
                         .padding()
                         Spacer()
                         
-                        HStack{
-                            VStack{
-                                UIKitImageView(imageName: "PQR1")
-                                    .frame(width: 75, height: 75)
-                                    .padding(80)
-                                
-                                Button(action: {
-                                    pqrData = pqr1Data
-                                    setting = .scanned
-                                }) {
-                                    Text("このコードを選ぶ")
-                                }
-                            }
-                            .padding(.trailing,200)
-                            
-                            VStack{
-                                UIKitImageView(imageName: "PQR2")
-                                    .frame(width: 75, height: 75)
-                                    .padding(80)
-                                
-                                Button(action: {
-                                    pqrData = pqr2Data
-                                    setting = .scanned
-                                }) {
-                                    Text("このコードを選ぶ")
-                                }
-                            }
-                        }
-                        .padding(.bottom,200)
+                    }
+                }
+                .onAppear {
+                    // 3秒後に setting を更新
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                        setting = .scanned
                     }
                 }
                 .onDisappear {
