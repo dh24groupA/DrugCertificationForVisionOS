@@ -471,7 +471,7 @@ struct ContentView: View {
                                                     Text("処方薬剤:")
                                                         .fontWeight(.bold)
                                                         .foregroundColor(.secondary)
-                                                    Text("\(medName.isEmpty ? "未入力" : medName)")
+                                                    Text("\(patientMed.isEmpty ? "未入力" : patientMed)")
                                                         .foregroundColor(.red)
                                                     
                                                 }
@@ -479,7 +479,7 @@ struct ContentView: View {
                                                     Text("読み込んだ薬剤:")
                                                         .fontWeight(.bold)
                                                         .foregroundColor(.secondary)
-                                                    Text("\(patientMed.isEmpty ? "未入力" : patientMed)")
+                                                    Text("\(medName.isEmpty ? "未入力" : medName)")
                                                         .foregroundColor(.red)
                                                 }
                                             }
