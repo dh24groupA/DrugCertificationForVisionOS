@@ -45,10 +45,9 @@ struct ContentView: View {
     @State private var medFrequency = ""
     @State private var medSideEffects = ""
     @State private var medContraindications = ""
-    
-    //@State private var lastDoseDate: Date? = nil//前回の記録日時
+
     @State private var currentTime = Date() // 現在時刻を保持
-    @State private var pastDates: [Date] = []
+    @State private var pastDates: [Date] = []//現在過去3回以外の情報が貯まるようになっている
     
     
     enum Setting {
@@ -292,8 +291,6 @@ struct ContentView: View {
                     
                     patientID = pqrData
                     
-                    let formattedDates = formattedAllDoseDates(for: patientID)
-                    formattedDates.forEach { print($0) }
                 }
                 
             case .scanned:
