@@ -46,8 +46,9 @@ struct ContentView: View {
     @State private var medSideEffects = ""
     @State private var medContraindications = ""
     
-    @State private var lastDoseDate: Date? = nil//前回の記録日時
+    //@State private var lastDoseDate: Date? = nil//前回の記録日時
     @State private var currentTime = Date() // 現在時刻を保持
+    @State private var pastDates: [Date] = []
     
     
     enum Setting {
@@ -79,11 +80,7 @@ struct ContentView: View {
                     .cornerRadius(10)
                 }
                 .onAppear {
-                    if let savedDate = loadLastDoseDate() {
-                        lastDoseDate = savedDate
-                    } else {
-                        lastDoseDate = nil // 記録がない場合
-                    }
+                    
                 }
                 
             case .medAuth:
@@ -292,6 +289,11 @@ struct ContentView: View {
                     patientPhoto = getJsonData(searchKey: "id", searchValue: pqrData, returnKey: "photo", fileName: "patients", type: patient.self)
                     
                     patientCurrentIllness = getJsonData(searchKey: "id", searchValue: pqrData, returnKey: "currentIllness", fileName: "patients", type: patient.self)
+                    
+                    patientID = pqrData
+                    
+                    let formattedDates = formattedAllDoseDates(for: patientID)
+                    formattedDates.forEach { print($0) }
                 }
                 
             case .scanned:
@@ -318,8 +320,9 @@ struct ContentView: View {
                                     Button("No") {}
                                     Button("Yes") {
                                         setting = .finished
-                                        lastDoseDate = Date()
-                                        saveLastDoseDate(lastDoseDate!)
+                                        let now = Date()
+                                        addDoseDate(for: patientID, date: now)
+
                                     }
                                 } message: {
                                     Text("完了すると看護記録に投与履歴が送信されます")
@@ -401,16 +404,19 @@ struct ContentView: View {
                                     .font(.headline)
                                     .foregroundColor(.gray)) {
                                         HStack {
-                                            Text("記録日:")
+                                            Text("記録日時:")
                                                 .fontWeight(.bold)
                                                 .foregroundColor(.secondary)
                                             Text("\(formattedDate(currentTime))")
                                         }
                                         HStack {
-                                            Text("前回投与日:")
+                                            Text("過去3回の記録日時:")
                                                 .fontWeight(.bold)
                                                 .foregroundColor(.secondary)
-                                            Text("\(formattedLastDoseDate(lastDoseDate))")
+                                            ForEach(pastDates.prefix(3), id: \.self) { date in
+                                                Text(formattedLastDoseDate(date),"\n")
+                                                    .foregroundColor(.secondary)
+                                            }
                                         }
                                     }
                                 
@@ -494,6 +500,7 @@ struct ContentView: View {
                     Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
                         currentTime = Date()
                     }
+                    pastDates = loadDoseDates(for: pqrData)
                 }
                 
             case .finished:
